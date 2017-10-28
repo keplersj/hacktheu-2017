@@ -8,10 +8,11 @@ local op = require "oplus"
 
 Population = 10
 TopPerformers = 1
-CreatureRunTimeMS = 1/2 * 60 * 1000
+CreatureRunTimeMS = 1 * 60 * 1000
 SwapMutationOdd = 0.25
 RandomResetOdd = 0.10
 NumCellsMutateOdd = 0.15
+StagnantGenerationCutoff = 200
 
 -- fitness is function of pop size vs. initial and area covered
 function calcFitness ()
@@ -94,6 +95,9 @@ function executeCreature (creature)
   end
 
   startPop = tonumber( g.getpop() )
+  
+  local lastPop = g.getpop()
+  local generationsStagnant = 0;
 
   local startTime = g.millisecs()
   while (g.millisecs() - startTime  < CreatureRunTimeMS) do
@@ -105,9 +109,21 @@ function executeCreature (creature)
 
     g.fit()
     g.step()
-
+    
     op.maketext( "Fitness: " .. calcFitness(), "fitness")
     op.pastetext(500, 0, op.identity, "fitness")
+        
+    if lastPop == g.getpop() then
+      if generationsStagnant == StagnantGenerationCutoff then
+        break
+      else
+        generationsStagnant = generationsStagnant + 1
+      end
+    else
+      generationsStagnant = 0
+    end
+    
+    lastPop = g.getpop()
   end
 
   creature.fitness = calcFitness()
