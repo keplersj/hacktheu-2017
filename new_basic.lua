@@ -81,7 +81,13 @@ function mutateCreature (creature)
     end
   end
 
-  -- TODO: num cells mutation
+  if math.random <= NumCellsMutateOdd then
+    local cellChangeVal = math.random(-2, 2)
+    creature.cellsPlaced += cellChangeVal
+    if creature.cellsPlaced < 0 do
+      creature.cellsPlaces = 0
+    end
+  end
   return creature
 end
 
@@ -105,20 +111,20 @@ end
 -- The Epoch Lifecycle
 while true do
   epochCount = epochCount + 1
-  
+
   op.maketext( "Epoch: " .. epochCount, "epoch")
   op.pastetext(0, 0, op.identity, "epoch")
-  
+
   for creatureIndex = 1, #creatures do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
-    
+
     creature = mutateCreature(creatures[creatureIndex])
     creatures[creatureIndex] = creature
-    
+
     executeCreature(creature)
   end
-  
+
   ov("delete epoch")
   ov("delete creature")
   ov("delete fitness")
