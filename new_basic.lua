@@ -28,6 +28,8 @@ function run ()
   -- five minutes = 300000
   while (g.millisecs() - startTime  < 300000) do
     if g.empty() then
+      op.maketext( "Fitness: " .. calcFitness())
+      op.pastetext(0, 0)
       break
     end
 
@@ -38,3 +40,5 @@ function run ()
     op.pastetext(0, 0)
   end
 end
+
+run()
