@@ -25,8 +25,8 @@ function run ()
   startPop = tonumber( g.getpop() )
 
   local startTime = g.millisecs()
-  -- five minutes = 300000
-  while (g.millisecs() - startTime  < 300000) do
+  -- 3 minutes = 180000
+  while (g.millisecs() - startTime  < 180000) do
     if g.empty() then
       op.maketext( "Fitness: " .. calcFitness())
       op.pastetext(0, 0)
@@ -42,3 +42,4 @@ function run ()
 end
 
 run()
+  -- take top 2
