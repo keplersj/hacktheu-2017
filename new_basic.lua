@@ -7,7 +7,7 @@ ov("create 1000 1000")
 local op = require "oplus"
 
 Population = 10
-TopPerformers = 2
+TopPerformers = 1
 CreatureRunTimeMS = 180000
 SwapMutationOdd = 0.25
 RandomResetOdd = 0.10
@@ -162,15 +162,19 @@ while true do
       end
     end
 
+    local epochEliteFitness = creatures[fittestIndex].fitness
     for savedEliteIndex = 1, TopPerformers do
       if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex].fitness then
         eliteCreatures[savedEliteIndex] = creatures[fittestIndex]
         break
       end
     end
-    table.remove(creatures, fittestIndex)
   end
 
+  for creatureIndex = 1, #creatures do
+    creatures[creatureIndex] = eliteCreatures[1]
+  end
+  
   ov("delete epoch")
   ov("delete creature")
   ov("delete fitness")
