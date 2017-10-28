@@ -27,26 +27,6 @@ function calcFitness ()
   return ((popSize * area) / startPop) + math.sqrt(startPop)
 end
 
-function run ()
-  local fitness = 0
-  startPop = tonumber( g.getpop() )
-
-  local startTime = g.millisecs()
-  while (g.millisecs() - startTime  < CreatureRunTimeMS) do
-    if g.empty() then
-      op.maketext( "Fitness: " .. calcFitness(), "fitness")
-      op.pastetext(500, 0, op.identity, "fitness")
-      break
-    end
-
-    g.fit()
-    g.step()
-
-    op.maketext( "Fitness: " .. calcFitness(), "fitness")
-    op.pastetext(500, 0, op.identity, "fitness")
-  end
-end
-
 -- Creates an initial creature with vary stupid defaults.
 function createCreature ()
   local creature = {}
@@ -113,7 +93,26 @@ function executeCreature (creature)
     g.putcells(creature.cellArray, 0, 0)
   end
   
-  run()
+  startPop = tonumber( g.getpop() )
+
+  local startTime = g.millisecs()
+  while (g.millisecs() - startTime  < CreatureRunTimeMS) do
+    if g.empty() then
+      op.maketext( "Fitness: " .. calcFitness(), "fitness")
+      op.pastetext(500, 0, op.identity, "fitness")
+      break
+    end
+
+    g.fit()
+    g.step()
+
+    op.maketext( "Fitness: " .. calcFitness(), "fitness")
+    op.pastetext(500, 0, op.identity, "fitness")
+  end
+  
+  creature.fitness = calcFitness()
+  
+  return creature
 end
 
 epochCount = 0
@@ -129,15 +128,25 @@ while true do
 
   op.maketext( "Epoch: " .. epochCount, "epoch")
   op.pastetext(0, 0, op.identity, "epoch")
+  
+  local highestFitness = 0
 
   for creatureIndex = 1, #creatures do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
+    
+    op.maketext( "Epoch Max: " .. highestFitness, "epochMaxFit")
+    op.pastetext(500, 25, op.identity, "epochMaxFit")
 
-    local creature = mutateCreature(creatures[creatureIndex])
-    creatures[creatureIndex] = creature
+    local mutatedCreature = mutateCreature(creatures[creatureIndex])
+    creatures[creatureIndex] = mutatedCreature
 
-    executeCreature(creature)
+    local executedCreature = executeCreature(mutatedCreature)
+    creatures[creatureIndex] = executedCreature
+    
+    if executedCreature.fitness > highestFitness then
+      highestFitness = executedCreature.fitness
+    end
   end
 
   ov("delete epoch")
