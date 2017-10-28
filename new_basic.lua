@@ -9,6 +9,9 @@ local op = require "oplus"
 Population = 10
 TopPerformers = 2
 CreatureRunTimeMS = 180000
+SwapMutationOdd = 0.25
+RandomResetOdd = 0.10
+NumCellsMutateOdd = 0.15
 
 -- fitness is function of pop size vs. initial and area covered
 function calcFitness ()
@@ -44,9 +47,43 @@ function run ()
   end
 end
 
-epochCount = 0
+function cloneCreature (creature)
+  local creature2 = {}
+  creature2.cellsPlaced = creature.cellsPlaced
+  creature2.cellArray = creature.cellArray
+  creature2.fitness = 0
+  return creature2
+end
 
--- The Epoch Lifestyle
+function mutateCreature (creature)
+  math.randomseed( g.millisecs() )
+  for i=1, #creature.cellArray do
+    -- Possible swap mutation
+    if math.random <= SwapMutationOdd do
+      local tempCoord = creature.cellArray[i]
+      local swapIndex = math.random(1, #creature.cellArray)
+      creature.cellArray[i] = creature.cellArray[swapIndex]
+      creature.cellArray[swapIndex] = tempCoord
+    end
+    -- Possible random value mutation
+    if math.random <= RandomResetOdd do
+      local newVal = math.random(-100, 100)
+      creature.cellArray[i] = newVal
+    end
+  end
+
+  -- TODO: num cells mutation
+  return creature
+end
+
+function executeCreature (creature)
+  g.select( g.getrect() )
+  g.clear(0)
+  g.putcells(creature.cellArray, 0, 0)
+end
+
+epochCount = 0
+-- The Epoch Lifecycle
 while true do
   epochCount = epochCount + 1
   op.maketext( "Epoch: " .. epochCount, "epoch")
