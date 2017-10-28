@@ -25,7 +25,7 @@ function calcFitness ()
   if startPop == 0 then
     return 0
   end
-  return ((popSize * area) / startPop) + math.log(startPop)
+  return ((popSize * area) / startPop) + math.log10(startPop)
 end
 
 -- Creates an initial creature with vary stupid defaults.
@@ -33,7 +33,7 @@ function createCreature ()
   local creature = {}
   creature.cellsPlaced = 0
   creature.cellArray = {}
-  creature.fitness = 0
+  creature.fitness = 0.0
   return creature
 end
 
@@ -57,7 +57,7 @@ function mutateCreature (creature)
     end
     -- Possible random value mutation
     if math.random() <= RandomResetOdd then
-      local newVal = math.random(-100, 100)
+      local newVal = math.random(-50, 50)
       creature.cellArray[i] = newVal
     end
   end
@@ -69,8 +69,8 @@ function mutateCreature (creature)
       creature.cellsPlaced = 0
     end
     if cellChangeVal > 0 then
-      table.insert(creature.cellArray, math.random(-100, 100) )
-      table.insert(creature.cellArray, math.random(-100, 100) )
+      table.insert(creature.cellArray, math.random(-50, 50) )
+      table.insert(creature.cellArray, math.random(-50, 50) )
     elseif cellChangeVal < 0 then
       for i = 1, cellChangeVal * -1 do
         table.remove(creature.cellArray, #creature.cellArray)
@@ -97,7 +97,8 @@ function executeCreature (creature)
   startPop = tonumber( g.getpop() )
   
   local lastPop = g.getpop()
-  local generationsStagnant = 0;
+  local generationsStagnant = 0
+  local creatureFitness = 0
 
   local startTime = g.millisecs()
   while (g.millisecs() - startTime  < CreatureRunTimeMS) do
@@ -106,22 +107,22 @@ function executeCreature (creature)
       op.pastetext(500, 0, op.identity, "fitness")
       break
     end
-
-    g.fit()
-    g.step()
-    
-    op.maketext( "Fitness: " .. calcFitness(), "fitness")
-    op.pastetext(500, 0, op.identity, "fitness")
-        
     if lastPop == g.getpop() then
       if generationsStagnant == StagnantGenerationCutoff then
-        break
+        creature.fitness = calcFitness()
+        return creature
       else
         generationsStagnant = generationsStagnant + 1
       end
     else
       generationsStagnant = 0
     end
+
+    g.fit()
+    g.step()
+    
+    op.maketext( "Fitness: " .. calcFitness(), "fitness")
+    op.pastetext(500, 0, op.identity, "fitness")
     
     lastPop = g.getpop()
   end
@@ -158,18 +159,21 @@ while true do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
 
-    op.maketext( "Epoch Max: " .. highestFitness, "epochMaxFit")
-    op.pastetext(500, 25, op.identity, "epochMaxFit")
-
     local mutatedCreature = mutateCreature(creatures[creatureIndex])
-    creatures[creatureIndex] = mutatedCreature
 
     local executedCreature = executeCreature(mutatedCreature)
     creatures[creatureIndex] = executedCreature
-
+    
     if executedCreature.fitness > highestFitness then
       highestFitness = executedCreature.fitness
     end
+    
+    op.maketext( "Epoch Max: " .. highestFitness, "epochMaxFit")
+    op.pastetext(500, 25, op.identity, "epochMaxFit")
+    
+    op.maketext( "Elite fitness: " .. eliteCreatures[1].fitness, "elitefitness")
+    op.pastetext(250, 25, op.identity, "elitefitness")
+    
   end
 
   for eliteIndex = 1, TopPerformers do
@@ -180,7 +184,6 @@ while true do
       end
     end
 
-    local epochEliteFitness = creatures[fittestIndex].fitness
     for savedEliteIndex = 1, TopPerformers do
       if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex].fitness then
         eliteCreatures[savedEliteIndex] = creatures[fittestIndex]
