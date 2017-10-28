@@ -8,7 +8,7 @@ local op = require "oplus"
 
 Population = 10
 TopPerformers = 1
-CreatureRunTimeMS = 180000
+CreatureRunTimeMS = 1 * 60 * 1000
 SwapMutationOdd = 0.25
 RandomResetOdd = 0.10
 NumCellsMutateOdd = 0.15
@@ -137,6 +137,8 @@ while true do
   local highestFitness = 0
 
   for creatureIndex = 1, #creatures do
+    g.new("epoch_".. epochCount .. "_creature_" .. creatureIndex)
+    
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
 
