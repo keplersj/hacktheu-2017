@@ -122,7 +122,7 @@ while true do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
 
-    creature = mutateCreature(creatures[creatureIndex])
+    local creature = mutateCreature(creatures[creatureIndex])
     creatures[creatureIndex] = creature
 
     executeCreature(creature)
