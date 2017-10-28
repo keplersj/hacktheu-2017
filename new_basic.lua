@@ -95,7 +95,7 @@ function executeCreature (creature)
   end
 
   startPop = tonumber( g.getpop() )
-  
+
   local lastPop = g.getpop()
   local generationsStagnant = 0
   local creatureFitness = 0
@@ -120,16 +120,20 @@ function executeCreature (creature)
 
     g.fit()
     g.step()
-    
+
     op.maketext( "Fitness: " .. calcFitness(), "fitness")
     op.pastetext(500, 0, op.identity, "fitness")
-    
+
     lastPop = g.getpop()
   end
 
   creature.fitness = calcFitness()
 
   return creature
+end
+
+function table.clone(org)
+  return {table.unpack(org)}
 end
 
 epochCount = 0
@@ -155,7 +159,7 @@ while true do
 
   for creatureIndex = 1, #creatures do
     g.new("epoch_".. epochCount .. "_creature_" .. creatureIndex)
-    
+
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
 
@@ -163,17 +167,17 @@ while true do
 
     local executedCreature = executeCreature(mutatedCreature)
     creatures[creatureIndex] = executedCreature
-    
+
     if executedCreature.fitness > highestFitness then
       highestFitness = executedCreature.fitness
     end
-    
+
     op.maketext( "Epoch Max: " .. highestFitness, "epochMaxFit")
     op.pastetext(500, 25, op.identity, "epochMaxFit")
-    
+
     op.maketext( "Elite fitness: " .. eliteCreatures[1].fitness, "elitefitness")
     op.pastetext(250, 25, op.identity, "elitefitness")
-    
+
   end
 
   for eliteIndex = 1, TopPerformers do
@@ -186,7 +190,12 @@ while true do
 
     for savedEliteIndex = 1, TopPerformers do
       if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex].fitness then
-        eliteCreatures[savedEliteIndex] = creatures[fittestIndex]
+        
+        eliteCreatures[savedEliteIndex].cellsPlaced = creatures[fittestIndex].cellsPlaced
+        eliteCreatures[savedEliteIndex].fitness = creatures[fittestIndex].fitness
+        for i = 1, #creatures[fittestIndex].cellArray do
+          eliteCreatures[savedEliteIndex].cellArray[i] = creatures[fittestIndex].cellArray[i]
+        end
         break
       end
     end
@@ -195,7 +204,7 @@ while true do
   for creatureIndex = 1, #creatures do
     creatures[creatureIndex] = eliteCreatures[1]
   end
-  
+
   ov("delete epoch")
   ov("delete creature")
   ov("delete fitness")
