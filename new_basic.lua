@@ -71,7 +71,7 @@ function mutateCreature (creature)
       table.insert(creature.cellArray, math.random(-100, 100) )
       table.insert(creature.cellArray, math.random(-100, 100) )
     elseif cellChangeVal < 0 then
-      for i = 0, cellChangeVal * -1 do
+      for i = 1, cellChangeVal * -1 do
         table.remove(creature.cellArray, #creature.cellArray)
       end
     end
@@ -88,11 +88,11 @@ function executeCreature (creature)
     g.select( g.getrect() )
     g.clear(0)
   end
-  
+
   if (#creature.cellArray >= 1 and #creature.cellArray % 2 == 0) then
     g.putcells(creature.cellArray, 0, 0)
   end
-  
+
   startPop = tonumber( g.getpop() )
 
   local startTime = g.millisecs()
@@ -109,14 +109,15 @@ function executeCreature (creature)
     op.maketext( "Fitness: " .. calcFitness(), "fitness")
     op.pastetext(500, 0, op.identity, "fitness")
   end
-  
+
   creature.fitness = calcFitness()
-  
+
   return creature
 end
 
 epochCount = 0
 creatures = {}
+eliteCreatures = {}
 
 for creatureIndex = 1, Population do
   creatures[creatureIndex] = createCreature()
@@ -128,13 +129,13 @@ while true do
 
   op.maketext( "Epoch: " .. epochCount, "epoch")
   op.pastetext(0, 0, op.identity, "epoch")
-  
+
   local highestFitness = 0
 
   for creatureIndex = 1, #creatures do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
-    
+
     op.maketext( "Epoch Max: " .. highestFitness, "epochMaxFit")
     op.pastetext(500, 25, op.identity, "epochMaxFit")
 
@@ -143,10 +144,27 @@ while true do
 
     local executedCreature = executeCreature(mutatedCreature)
     creatures[creatureIndex] = executedCreature
-    
+
     if executedCreature.fitness > highestFitness then
       highestFitness = executedCreature.fitness
     end
+  end
+
+  for eliteIndex = 1, TopPerformers do
+    local fittestIndex = 1
+    for creatureIndex = 1, #creatures do
+      if creatures[creatureIndex].fitness > creatures[fittestIndex].fitness then
+        fittestIndex = creatureIndex
+      end
+    end
+
+    for savedEliteIndex = TopPerformers, 1, -1 do
+      if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex] then
+        eliteCreatures[savedEliteIndex] = creatures[fittestIndex]
+        break
+      end
+    end
+    table.remove(creatures, fittestIndex)
   end
 
   ov("delete epoch")
