@@ -87,6 +87,14 @@ function mutateCreature (creature)
     if creature.cellsPlaced < 0 then
       creature.cellsPlaced = 0
     end
+    if cellChangeVal > 0 then
+      table.insert(creature.cellArray, math.random(-100, 100) )
+      table.insert(creature.cellArray, math.random(-100, 100) )
+    elseif cellChangeVal < 0 then
+      for i = 0, cellChangeVal * -1 do
+        table.remove(creature.cellArray, #creature.cellArray)
+      end
+    end
   end
   return creature
 end
@@ -94,7 +102,7 @@ end
 function executeCreature (creature)
   op.maketext( "Creature Cell Place Count: " .. creature.cellsPlaced, "creature")
   op.pastetext(0, 25, op.identity, "creature")
-  
+
   local rect = g.getrect()
   if #rect >= 1 then
     g.select( g.getrect() )
