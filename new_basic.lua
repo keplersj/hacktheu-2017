@@ -8,7 +8,7 @@ local op = require "oplus"
 
 Population = 10
 TopPerformers = 1
-CreatureRunTimeMS = 1 * 60 * 1000
+CreatureRunTimeMS = 1/2 * 60 * 1000
 SwapMutationOdd = 0.25
 RandomResetOdd = 0.10
 NumCellsMutateOdd = 0.15
@@ -24,7 +24,7 @@ function calcFitness ()
   if startPop == 0 then
     return 0
   end
-  return ((popSize * area) / startPop) + math.sqrt(startPop)
+  return ((popSize * area) / startPop) + math.log(startPop)
 end
 
 -- Creates an initial creature with vary stupid defaults.
