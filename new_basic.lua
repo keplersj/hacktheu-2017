@@ -24,7 +24,7 @@ function calcFitness ()
   if startPop == 0 then
     return 0
   end
-  return (popSize * area) / startPop
+  return ((popSize * area) / startPop) + math.sqrt(startPop)
 end
 
 function run ()
