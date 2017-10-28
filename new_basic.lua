@@ -108,7 +108,11 @@ function executeCreature (creature)
     g.select( g.getrect() )
     g.clear(0)
   end
-  g.putcells(creature.cellArray, 0, 0)
+  
+  if (#creature.cellArray >= 1 and #creature.cellArray % 2 == 0) then
+    g.putcells(creature.cellArray, 0, 0)
+  end
+  
   run()
 end
 
