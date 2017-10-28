@@ -68,30 +68,33 @@ function mutateCreature (creature)
   math.randomseed( g.millisecs() )
   for i=1, #creature.cellArray do
     -- Possible swap mutation
-    if math.random <= SwapMutationOdd then
+    if math.random() <= SwapMutationOdd then
       local tempCoord = creature.cellArray[i]
       local swapIndex = math.random(1, #creature.cellArray)
       creature.cellArray[i] = creature.cellArray[swapIndex]
       creature.cellArray[swapIndex] = tempCoord
     end
     -- Possible random value mutation
-    if math.random <= RandomResetOdd then
+    if math.random() <= RandomResetOdd then
       local newVal = math.random(-100, 100)
       creature.cellArray[i] = newVal
     end
   end
 
-  if math.random <= NumCellsMutateOdd then
+  if math.random() <= NumCellsMutateOdd then
     local cellChangeVal = math.random(-2, 2)
-    creature.cellsPlaced += cellChangeVal
-    if creature.cellsPlaced < 0 do
-      creature.cellsPlaces = 0
+    creature.cellsPlaced = creature.cellsPlaced + cellChangeVal
+    if creature.cellsPlaced < 0 then
+      creature.cellsPlaced = 0
     end
   end
   return creature
 end
 
 function executeCreature (creature)
+  op.maketext( "Creature Cell Place Count: " .. creature.cellsPlaced, "creature")
+  op.pastetext(0, 25, op.identity, "creature")
+  
   local rect = g.getrect()
   if #rect >= 1 then
     g.select( g.getrect() )
