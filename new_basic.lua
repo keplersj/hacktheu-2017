@@ -59,14 +59,14 @@ function mutateCreature (creature)
   math.randomseed( g.millisecs() )
   for i=1, #creature.cellArray do
     -- Possible swap mutation
-    if math.random <= SwapMutationOdd do
+    if math.random <= SwapMutationOdd then
       local tempCoord = creature.cellArray[i]
       local swapIndex = math.random(1, #creature.cellArray)
       creature.cellArray[i] = creature.cellArray[swapIndex]
       creature.cellArray[swapIndex] = tempCoord
     end
     -- Possible random value mutation
-    if math.random <= RandomResetOdd do
+    if math.random <= RandomResetOdd then
       local newVal = math.random(-100, 100)
       creature.cellArray[i] = newVal
     end
