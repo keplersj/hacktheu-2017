@@ -123,6 +123,10 @@ for creatureIndex = 1, Population do
   creatures[creatureIndex] = createCreature()
 end
 
+for creatureIndex = 1, TopPerformers do
+  eliteCreatures[creatureIndex] = createCreature()
+end
+
 -- The Epoch Lifecycle
 while true do
   epochCount = epochCount + 1
@@ -158,8 +162,8 @@ while true do
       end
     end
 
-    for savedEliteIndex = TopPerformers, 1, -1 do
-      if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex] then
+    for savedEliteIndex = 1, TopPerformers do
+      if creatures[fittestIndex].fitness > eliteCreatures[savedEliteIndex].fitness then
         eliteCreatures[savedEliteIndex] = creatures[fittestIndex]
         break
       end
