@@ -47,6 +47,15 @@ function run ()
   end
 end
 
+-- Creates an initial creature with vary stupid defaults.
+function createCreature ()
+  local creature = {}
+  creature.cellsPlaced = 0
+  creature.cellArray = {}
+  creature.fitness = 0
+  return creature
+end
+
 function cloneCreature (creature)
   local creature2 = {}
   creature2.cellsPlaced = creature.cellsPlaced
@@ -77,22 +86,39 @@ function mutateCreature (creature)
 end
 
 function executeCreature (creature)
-  g.select( g.getrect() )
-  g.clear(0)
+  local rect = g.getrect()
+  if #rect >= 1 then
+    g.select( g.getrect() )
+    g.clear(0)
+  end
   g.putcells(creature.cellArray, 0, 0)
+  run()
 end
 
 epochCount = 0
+creatures = {}
+
+for creatureIndex = 1, Population do
+  creatures[creatureIndex] = createCreature()
+end
+
 -- The Epoch Lifecycle
 while true do
   epochCount = epochCount + 1
+  
   op.maketext( "Epoch: " .. epochCount, "epoch")
   op.pastetext(0, 0, op.identity, "epoch")
-  for creatureIndex = 1, Population do
+  
+  for creatureIndex = 1, #creatures do
     op.maketext( "Creature: " .. creatureIndex, "creature")
     op.pastetext(250, 0, op.identity, "creature")
-    run()
+    
+    creature = mutateCreature(creatures[creatureIndex])
+    creatures[creatureIndex] = creature
+    
+    executeCreature(creature)
   end
+  
   ov("delete epoch")
   ov("delete creature")
   ov("delete fitness")
