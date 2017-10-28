@@ -6,6 +6,10 @@ ov("create 1000 1000")
 
 local op = require "oplus"
 
+Population = 10
+TopPerformers = 2
+CreatureRunTimeMS = 180000
+
 -- fitness is function of pop size vs. initial and area covered
 function calcFitness ()
  local popSize = tonumber( g.getpop() )
@@ -25,21 +29,34 @@ function run ()
   startPop = tonumber( g.getpop() )
 
   local startTime = g.millisecs()
-  -- 3 minutes = 180000
-  while (g.millisecs() - startTime  < 180000) do
+  while (g.millisecs() - startTime  < CreatureRunTimeMS) do
     if g.empty() then
-      op.maketext( "Fitness: " .. calcFitness())
-      op.pastetext(0, 0)
+      op.maketext( "Fitness: " .. calcFitness(), "fitness")
+      op.pastetext(500, 0, op.identity, "fitness")
       break
     end
 
     g.fit()
     g.step()
 
-    op.maketext( "Fitness: " .. calcFitness())
-    op.pastetext(0, 0)
+    op.maketext( "Fitness: " .. calcFitness(), "fitness")
+    op.pastetext(500, 0, op.identity, "fitness")
   end
 end
 
-run()
-  -- take top 2
+epochCount = 0
+
+-- The Epoch Lifestyle
+while true do
+  epochCount = epochCount + 1
+  op.maketext( "Epoch: " .. epochCount, "epoch")
+  op.pastetext(0, 0, op.identity, "epoch")
+  for creatureIndex = 1, Population do
+    op.maketext( "Creature: " .. creatureIndex, "creature")
+    op.pastetext(250, 0, op.identity, "creature")
+    run()
+  end
+  ov("delete epoch")
+  ov("delete creature")
+  ov("delete fitness")
+end
